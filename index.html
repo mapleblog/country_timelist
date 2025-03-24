@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>European Cities and Malaysia Time Difference</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --primary-light: #e0e7ff;
+            --secondary: #0ea5e9;
+            --accent: #f43f5e;
+            --background: #f9fafb;
+            --card: #ffffff;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --border: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: var(--background);
+            color: var(--text);
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .header-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 107%, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 5%, rgba(255, 255, 255, 0) 45%);
+            z-index: 1;
+        }
+        
+        .header-title {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+        
+        .header-time {
+            font-size: 20px;
+            font-weight: 500;
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 8px 16px;
+            border-radius: 30px;
+            backdrop-filter: blur(8px);
+        }
+        
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 24px;
+            gap: 24px;
+        }
+        
+        @media (min-width: 768px) {
+            main {
+                flex-direction: row;
+            }
+        }
+        
+        .city-list {
+            width: 100%;
+            overflow-y: auto;
+        }
+        
+        @media (min-width: 768px) {
+            .city-list {
+                width: 50%;
+                padding-right: 12px;
+            }
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            color: var(--primary);
+        }
+        
+        .section-icon {
+            margin-right: 8px;
+        }
+        
+        .city-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+        
+        @media (min-width: 640px) {
+            .city-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .city-card {
+            background-color: var(--card);
+            border-radius: var(--radius);
+            padding: 16px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .city-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(79, 70, 229, 0.3);
+        }
+        
+        .city-card.selected {
+            border: 2px solid var(--primary);
+        }
+        
+        .city-card.malaysia {
+            background: linear-gradient(to right, rgba(255, 246, 217, 0.5), rgba(255, 248, 227, 0.8));
+            border: none;
+        }
+        
+        .city-card.malaysia::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M30,30 L70,30 L70,70 L30,70 Z" fill="none" stroke="rgba(79, 70, 229, 0.1)" stroke-width="1" /></svg>');
+            background-size: 20px;
+            opacity: 0.3;
+            z-index: 0;
+        }
+        
+        .city-header {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .city-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .city-flag {
+            font-size: 28px;
+            margin-right: 12px;
+            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+        }
+        
+        .city-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 2px;
+        }
+        
+        .city-country {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+        
+        .city-time {
+            text-align: right;
+        }
+        
+        .city-time-value {
+            font-size: 18px;
+            font-family: 'Inter', monospace;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            color: var(--primary-dark);
+        }
+        
+        .city-diff {
+            color: var(--secondary);
+            font-size: 14px;
+            font-weight: 500;
+            margin-top: 4px;
+        }
+        
+        .city-details {
+            width: 100%;
+            background-color: var(--background);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        @media (min-width: 768px) {
+            .city-details {
+                width: 50%;
+            }
+        }
+        
+        .detail-card {
+            background-color: var(--card);
+            border-radius: var(--radius);
+            padding: 32px;
+            box-shadow: var(--shadow-lg);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .detail-decorator {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle at 100% 0%, var(--primary-light) 0%, rgba(224, 231, 255, 0) 60%);
+            opacity: 0.6;
+            z-index: 0;
+        }
+        
+        .detail-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 32px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .detail-flag {
+            font-size: 40px;
+            margin-right: 16px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        }
+        
+        .detail-title {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            margin-bottom: 4px;
+        }
+        
+        .detail-country {
+            color: var(--text-light);
+            font-size: 16px;
+        }
+        
+        .detail-body {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        @media (min-width: 640px) {
+            .detail-body {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .detail-section {
+            position: relative;
+        }
+        
+        .detail-full {
+            grid-column: 1 / -1;
+        }
+        
+        .detail-label {
+            color: var(--text-light);
+            font-size: 14px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .detail-date {
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        .detail-time {
+            font-size: 36px;
+            font-weight: 700;
+            font-family: 'Inter', monospace;
+            letter-spacing: -0.02em;
+            color: var(--primary-dark);
+            margin-top: 4px;
+        }
+        
+        .detail-time-dot {
+            display: inline-block;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        .detail-diff {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--secondary);
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .badge-dst {
+            background-color: rgba(244, 63, 94, 0.1);
+            color: var(--accent);
+        }
+        
+        .badge-std {
+            background-color: rgba(14, 165, 233, 0.1);
+            color: var(--secondary);
+        }
+        
+        .example-box {
+            margin-top: 32px;
+            padding: 20px;
+            background-color: rgba(79, 70, 229, 0.05);
+            border-radius: var(--radius);
+            border-left: 4px solid var(--primary);
+            grid-column: 1 / -1;
+        }
+        
+        .example-title {
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 12px;
+        }
+        
+        .example-text {
+            color: var(--text);
+            line-height: 1.5;
+        }
+        
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-light);
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 24px;
+            color: rgba(79, 70, 229, 0.2);
+            position: relative;
+        }
+        
+        .empty-icon::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            background-color: rgba(79, 70, 229, 0.08);
+            border-radius: 50%;
+            z-index: -1;
+        }
+        
+        .empty-text {
+            font-size: 16px;
+            font-weight: 500;
+            max-width: 240px;
+        }
+        
+        footer {
+            background-color: white;
+            padding: 12px;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 14px;
+            border-top: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-bg"></div>
+        <div class="header-content">
+            <div class="header-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 12px;">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                Europe and Malaysia Time Comparison
+            </div>
+            <div class="header-time" id="malaysiaHeaderTime"></div>
+        </div>
+    </header>
+
+    <main>
+        <div class="city-list">
+            <div class="section-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="section-icon">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                City List
+            </div>
+            <div class="city-grid" id="cityGrid"></div>
+        </div>
+
+        <div class="city-details" id="cityDetails">
+            <div class="empty-state">
+                <div class="empty-icon">🕰️</div>
+                <p class="empty-text">Select a city to view detailed time information</p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        © <span id="currentYear"></span> European Cities and Malaysia Time Difference · Real-time updates
+    </footer>
+
+    <script>
+        // City data
+        const cities = [
+            { name: 'Messina', country: 'Italy', timezone: 'Europe/Rome', flag: '🇮🇹' },
+            { name: 'Wiltz', country: 'Luxembourg', timezone: 'Europe/Luxembourg', flag: '🇱🇺' },
+            { name: 'Dinnington', country: 'United Kingdom', timezone: 'Europe/London', flag: '🇬🇧' },
+            { name: 'Duna', country: 'Slovakia', timezone: 'Europe/Bratislava', flag: '🇸🇰' },
+            { name: 'Greystones', country: 'Ireland', timezone: 'Europe/Dublin', flag: '🇮🇪' },
+            { name: 'Hoboken', country: 'Belgium', timezone: 'Europe/Brussels', flag: '🇧🇪' },
+            { name: 'Llagostera', country: 'Spain', timezone: 'Europe/Madrid', flag: '🇪🇸' },
+            { name: 'Schwerin', country: 'Germany', timezone: 'Europe/Berlin', flag: '🇩🇪' },
+            { name: 'Chassal', country: 'France', timezone: 'Europe/Paris', flag: '🇫🇷' },
+            { name: 'Valframbert', country: 'France', timezone: 'Europe/Paris', flag: '🇫🇷' },
+            { name: 'Malaysia', country: 'Malaysia', timezone: 'Asia/Kuala_Lumpur', flag: '🇲🇾' }
+        ];
+        
+        let selectedCity = null;
+        
+        // Initialize the page
+        function initApp() {
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+            renderCityGrid();
+            updateTimes();
+            
+            // Update times every second
+            setInterval(updateTimes, 1000);
+        }
+        
+        // Render city grid
+        function renderCityGrid() {
+            const cityGrid = document.getElementById('cityGrid');
+            cityGrid.innerHTML = '';
+            
+            cities.forEach(city => {
+                const cityCard = document.createElement('div');
+                cityCard.className = `city-card ${city.name === selectedCity?.name ? 'selected' : ''} ${city.name === 'Malaysia' ? 'malaysia' : ''}`;
+                cityCard.addEventListener('click', () => showCityDetails(city));
+                
+                cityCard.innerHTML = `
+                    <div class="city-header">
+                        <div class="city-info">
+                            <span class="city-flag">${city.flag}</span>
+                            <div>
+                                <div class="city-name">${city.name}</div>
+                                <div class="city-country">${city.country}</div>
+                            </div>
+                        </div>
+                        <div class="city-time">
+                            <div class="city-time-value" id="time-${city.name.replace(/\s+/g, '-')}"></div>
+                            ${city.name !== 'Malaysia' ? `<div class="city-diff" id="diff-${city.name.replace(/\s+/g, '-')}"></div>` : ''}
+                        </div>
+                    </div>
+                `;
+                
+                cityGrid.appendChild(cityCard);
+            });
+        }
+        
+        // Show city details
+        function showCityDetails(city) {
+            selectedCity = city;
+            renderCityGrid(); // Re-render to update selected state
+            
+            const cityDetails = document.getElementById('cityDetails');
+            
+            if (city) {
+                const isDST = checkIsDST(city.timezone);
+                
+                cityDetails.innerHTML = `
+                    <div class="detail-card">
+                        <div class="detail-decorator"></div>
+                        <div class="detail-header">
+                            <span class="detail-flag">${city.flag}</span>
+                            <div>
+                                <div class="detail-title">${city.name}</div>
+                                <div class="detail-country">${city.country}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-body">
+                            <div class="detail-section">
+                                <div class="detail-label">Current Date</div>
+                                <div class="detail-date" id="detail-date-${city.name.replace(/\s+/g, '-')}"></div>
+                            </div>
+                            
+                            <div class="detail-section">
+                                <div class="detail-label">Current Time</div>
+                                <div class="detail-time" id="detail-time-${city.name.replace(/\s+/g, '-')}"></div>
+                            </div>
+                            
+                            ${city.name !== 'Malaysia' ? `
+                                <div class="detail-section">
+                                    <div class="detail-label">Time Difference with Malaysia</div>
+                                    <div class="detail-diff" id="detail-diff-${city.name.replace(/\s+/g, '-')}"></div>
+                                </div>
+                                
+                                <div class="detail-section">
+                                    <div class="detail-label">Timezone Information</div>
+                                    <div>
+                                        ${isDST ? 
+                                            '<span class="badge badge-dst">Daylight Saving Time Active</span>' : 
+                                            '<span class="badge badge-std">Standard Time</span>'
+                                        }
+                                    </div>
+                                </div>
+                                
+                                <div class="example-box detail-full">
+                                    <div class="example-title">Time Difference Reference</div>
+                                    <p class="example-text">
+                                        When it's <strong>8:00 AM</strong> in Malaysia, it's 
+                                        <strong>${city.timezone.includes('London') || city.timezone.includes('Dublin') ? 
+                                            (isDST ? '1:00 AM (DST)' : '12:00 AM (Standard Time)') : 
+                                            (isDST ? '2:00 AM (DST)' : '1:00 AM (Standard Time)')}</strong> in ${city.name}
+                                    </p>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            } else {
+                cityDetails.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🕰️</div>
+                        <p class="empty-text">Select a city to view detailed time information</p>
+                    </div>
+                `;
+            }
+            
+            updateTimes();
+        }
+        
+        // Update all times
+        function updateTimes() {
+            // Update Malaysia header time
+            const malaysiaTime = moment().tz('Asia/Kuala_Lumpur');
+            document.getElementById('malaysiaHeaderTime').textContent = malaysiaTime.format('HH:mm:ss');
+            
+            // Update all city times
+            cities.forEach(city => {
+                const cityTime = moment().tz(city.timezone);
+                const cityId = city.name.replace(/\s+/g, '-');
+                
+                // Update time in city list
+                const timeElement = document.getElementById(`time-${cityId}`);
+                if (timeElement) {
+                    timeElement.textContent = cityTime.format('HH:mm:ss');
+                }
+                
+                // Update time difference
+                if (city.name !== 'Malaysia') {
+                    const diffElement = document.getElementById(`diff-${cityId}`);
+                    if (diffElement) {
+                        diffElement.textContent = getTimeDifference(city.timezone);
+                    }
+                }
+                
+                // If this city is selected, update details area
+                if (selectedCity && city.name === selectedCity.name) {
+                    const dateElement = document.getElementById(`detail-date-${cityId}`);
+                    if (dateElement) {
+                        dateElement.textContent = cityTime.format('MMMM D, YYYY dddd');
+                    }
+                    
+                    const detailTimeElement = document.getElementById(`detail-time-${cityId}`);
+                    if (detailTimeElement) {
+                        const timeString = cityTime.format('HH:mm:ss');
+                        // Add blinking effect for seconds
+                        const [hours, minutes, seconds] = timeString.split(':');
+                        detailTimeElement.innerHTML = `${hours}<span class="detail-time-dot">:</span>${minutes}<span class="detail-time-dot">:</span>${seconds}`;
+                    }
+                    
+                    if (city.name !== 'Malaysia') {
+                        const detailDiffElement = document.getElementById(`detail-diff-${cityId}`);
+                        if (detailDiffElement) {
+                            detailDiffElement.textContent = getTimeDifference(city.timezone);
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Calculate time difference
+        function getTimeDifference(timezone) {
+            const malaysiaTime = moment().tz('Asia/Kuala_Lumpur');
+            const cityTime = moment().tz(timezone);
+            
+            // Get hours from both locations
+            const malaysiaHour = malaysiaTime.hour();
+            const cityHour = cityTime.hour();
+            
+            // Calculate hour difference
+            let hourDiff = malaysiaHour - cityHour;
+            
+            // Handle cross-day cases
+            if (hourDiff < -12) {
+                hourDiff += 24;
+            } else if (hourDiff > 12) {
+                hourDiff -= 24;
+            }
+            
+            return `${hourDiff >= 0 ? '+' : ''}${hourDiff} hours`;
+        }
+        
+        // Check if DST is active
+        function checkIsDST(timezone) {
+            return moment().tz(timezone).isDST();
+        }
+        
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
